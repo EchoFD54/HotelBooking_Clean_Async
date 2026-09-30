@@ -39,45 +39,18 @@ namespace HotelBooking.UnitTests{
             bookingManager = new BookingManager(mockBookingRepository.Object, mockRoomRepository.Object);
         }
 
-        [Theory]
-        [InlineData(0, 0)]   
-        [InlineData(-1, 5)]  
-        [InlineData(5, 3)]   
-        public async Task FindAvailableRoom_InvalidDates_ThrowsArgumentException(int startOffsetDays, int endOffsetDays){
-            // Arrange
-            DateTime startDate = DateTime.Today.AddDays(startOffsetDays);
-            DateTime endDate = DateTime.Today.AddDays(endOffsetDays);
-
-            // Act
-            Func<Task> act = async () => await bookingManager.FindAvailableRoom(startDate, endDate);
-
-            // Assert
-            await Assert.ThrowsAsync<ArgumentException>(act);
-        }
-
-        [Theory]
-        [InlineData(1, 4)]   
-        [InlineData(10, 17)] 
-        [InlineData(20, 25)] 
-        public async Task FindAvailableRoom_RoomAvailable_ReturnsValidRoomId(int startOffsetDays, int endOffsetDays){
-            DateTime startDate = DateTime.Today.AddDays(startOffsetDays);
-            DateTime endDate = DateTime.Today.AddDays(endOffsetDays);
-
-            int roomId = await bookingManager.FindAvailableRoom(startDate, endDate);
-
-            Assert.True(roomId > 0); 
-        }
-
         [Fact]
         public async Task CreateBooking_RoomAvailable_CallsAddAsyncAndReturnsTrue(){
-            var newBooking = new Booking 
-            { 
+            // Arrange
+            var newBooking = new Booking { 
                 StartDate = DateTime.Today.AddDays(20), 
                 EndDate = DateTime.Today.AddDays(25) 
             };
 
+            // Act
             bool result = await bookingManager.CreateBooking(newBooking);
 
+            // Assert
             Assert.True(result);
             Assert.True(newBooking.IsActive);
             
@@ -144,6 +117,34 @@ namespace HotelBooking.UnitTests{
             Assert.True(newBooking.IsActive);
             mockBookingRepository.Verify(repo => repo.AddAsync(newBooking), Times.Once);
         }
+
+        [Theory]
+        [InlineData(0, 0)]   
+        [InlineData(-1, 5)]  
+        [InlineData(5, 3)]   
+        public async Task FindAvailableRoom_InvalidDates_ThrowsArgumentException(int startOffsetDays, int endOffsetDays){
+            DateTime startDate = DateTime.Today.AddDays(startOffsetDays);
+            DateTime endDate = DateTime.Today.AddDays(endOffsetDays);
+
+            Func<Task> act = async () => await bookingManager.FindAvailableRoom(startDate, endDate);
+
+            await Assert.ThrowsAsync<ArgumentException>(act);
+        }
+
+        [Theory]
+        [InlineData(1, 4)]   
+        [InlineData(10, 17)] 
+        [InlineData(20, 25)] 
+        public async Task FindAvailableRoom_RoomAvailable_ReturnsValidRoomId(int startOffsetDays, int endOffsetDays){
+            DateTime startDate = DateTime.Today.AddDays(startOffsetDays);
+            DateTime endDate = DateTime.Today.AddDays(endOffsetDays);
+
+            int roomId = await bookingManager.FindAvailableRoom(startDate, endDate);
+
+            Assert.True(roomId > 0); 
+        }
+
+        
 
         [Theory]
         [InlineData(1, 5, 0)]  
