@@ -15,7 +15,6 @@ namespace HotelBooking.UnitTests{
             mockBookingRepository = new Mock<IRepository<Booking>>();
             mockRoomRepository = new Mock<IRepository<Room>>();
 
-            //  fake rooms
             var rooms = new List<Room>{
                 new Room { Id = 1, Description = "Room 1" },
                 new Room { Id = 2, Description = "Room 2" },
@@ -25,11 +24,8 @@ namespace HotelBooking.UnitTests{
 
         
             var bookings = new List<Booking>{
-                // Room 1 is booked for 3 nights
                 new Booking { Id = 1, RoomId = 1, StartDate = DateTime.Today.AddDays(1), EndDate = DateTime.Today.AddDays(4), IsActive = true },
-                // room 3 is booked for a whole week
                 new Booking { Id = 2, RoomId = 3, StartDate = DateTime.Today.AddDays(10), EndDate = DateTime.Today.AddDays(17), IsActive = true },
-                // room 4 has a CANCELLED (inactive) booking during Room 1's time
                 new Booking { Id = 3, RoomId = 4, StartDate = DateTime.Today.AddDays(1), EndDate = DateTime.Today.AddDays(4), IsActive = false }
             };
             
