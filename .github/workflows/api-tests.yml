@@ -1,0 +1,38 @@
+name: Automated API Tests (Postman)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  run-api-tests:
+    name: Run Postman Tests against Web API
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x' 
+
+    - name: Build the Web API
+      run: dotnet build HotelBooking.WebApi/HotelBooking.WebApi.csproj
+
+    - name: Start Web API in the background
+      env:
+        ASPNETCORE_URLS: 'https://+:5001;http://+:5000'
+      run: |
+        dotnet HotelBooking.WebApi/bin/Debug/net10.0/HotelBooking.WebApi.dll &
+        sleep 10 # Pause for 10 seconds to ensure the API has fully started before testing
+
+    - name: Install Newman (Postman CLI)
+
+      run: npm install -g newman
+
+    - name: Run Postman Collection
+      run: newman run ./Postman/HotelBooking_API_Tests.postman_collection.json --insecure --env-var "baseUrl=https://localhost:5001"
